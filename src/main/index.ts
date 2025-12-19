@@ -3,21 +3,27 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+// 1. Importamos la base de datos y los registradores de handlers
+import { initDB } from './database'
+import { registerWindowHandlers } from './handlers/window.ipc'
+
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
-    show: false, // Mantenemos oculto hasta que esté listo
+    show: false,
     autoHideMenuBar: true,
+    frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      contextIsolation: true
     }
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.maximize() // <--- Esto fuerza la pantalla completa (maximizada)
+    mainWindow.maximize()
     mainWindow.show()
   })
 
@@ -26,7 +32,12 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // Carga de la URL (Dev) o Archivo (Prod)
+  // 2. Inicializamos la base de datos
+  initDB()
+
+  // 3. Registramos todos los handlers modulares
+  registerWindowHandlers(mainWindow)
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -35,8 +46,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  // Configuración básica
-  electronApp.setAppUserModelId('com.coffee-manager')
+  electronApp.setAppUserModelId('com.electron')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
