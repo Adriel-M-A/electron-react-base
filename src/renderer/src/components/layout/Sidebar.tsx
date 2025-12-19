@@ -29,7 +29,7 @@ export function Sidebar({ className, onMobileClick, collapsed = false }: Sidebar
         <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
           <NotebookPen className="h-6 w-6" />
           {/* Ocultamos el texto si está colapsado */}
-          {!collapsed && <span className="animate-in fade-in duration-300">Control</span>}
+          {!collapsed && <span className="animate-in fade-in duration-300">Titulo</span>}
         </div>
       </div>
 
