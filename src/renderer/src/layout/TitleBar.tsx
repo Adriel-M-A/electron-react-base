@@ -1,14 +1,19 @@
 import { useState } from 'react'
 import { Minus, Square, X, Copy } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 export default function TitleBar(): React.ReactElement {
   const [isMaximized, setIsMaximized] = useState(true)
+  const { isLogin } = useAuth() // Obtenemos el estado de login
 
   const handleMinimize = (): void => {
     window.api.window.minimize()
   }
 
   const handleMaximize = (): void => {
+    // Evitamos ejecutar la lógica si estamos en login para prevenir errores visuales
+    if (isLogin) return
+
     window.api.window.maximize()
     setIsMaximized(!isMaximized)
   }
@@ -37,18 +42,20 @@ export default function TitleBar(): React.ReactElement {
           <Minus className="h-4 w-4" />
         </button>
 
-        {/* Botón Maximizar / Restaurar */}
-        <button
-          onClick={handleMaximize}
-          className="flex h-full w-10 items-center justify-center hover:bg-white/10 transition-colors focus:outline-none"
-          title={isMaximized ? 'Restaurar' : 'Maximizar'}
-        >
-          {isMaximized ? (
-            <Copy className="h-3.5 w-3.5 rotate-180" />
-          ) : (
-            <Square className="h-3.5 w-3.5" />
-          )}
-        </button>
+        {/* Botón Maximizar / Restaurar: Solo se renderiza si NO estamos en login */}
+        {!isLogin && (
+          <button
+            onClick={handleMaximize}
+            className="flex h-full w-10 items-center justify-center hover:bg-white/10 transition-colors focus:outline-none"
+            title={isMaximized ? 'Restaurar' : 'Maximizar'}
+          >
+            {isMaximized ? (
+              <Copy className="h-3.5 w-3.5 rotate-180" />
+            ) : (
+              <Square className="h-3.5 w-3.5" />
+            )}
+          </button>
+        )}
 
         {/* Botón Cerrar */}
         <button

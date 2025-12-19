@@ -1,11 +1,16 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
-// Estructuramos la API por dominios para mayor claridad en el Frontend
 const api = {
   window: {
     minimize: () => ipcRenderer.send('window-minimize'),
     maximize: () => ipcRenderer.send('window-maximize'),
-    close: () => ipcRenderer.send('window-close')
+    close: () => ipcRenderer.send('window-close'),
+    setLoginSize: () => ipcRenderer.send('window:set-login-size'),
+    setAppSize: () => ipcRenderer.send('window:set-app-size')
+  },
+  auth: {
+    login: (credentials) => ipcRenderer.invoke('auth:login', credentials),
+    createUser: (userData) => ipcRenderer.invoke('auth:create-user', userData)
   }
 }
 
@@ -16,6 +21,6 @@ if (process.contextIsolated) {
     console.error(error)
   }
 } else {
-  // @ts-ignore (para entornos sin aislamiento)
+  // @ts-ignore
   window.api = api
 }

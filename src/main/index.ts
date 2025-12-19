@@ -3,17 +3,20 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-// 1. Importamos la base de datos y los registradores de handlers
+// Importaciones de base de datos y handlers
 import { initDB } from './database'
 import { registerWindowHandlers } from './handlers/window.ipc'
+import { registerAuthHandlers } from './handlers/auth.ipc'
 
 function createWindow(): void {
+  // Creamos la ventana con el tamaño inicial de Login
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 400,
+    height: 550,
     show: false,
     autoHideMenuBar: true,
-    frame: false,
+    frame: false, // Frameless para usar nuestra TitleBar
+    resizable: false, // Iniciamos sin redimensión para el Login
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -23,7 +26,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.maximize()
+    // No maximizamos aquí, dejamos que el AuthContext decida el tamaño
     mainWindow.show()
   })
 
@@ -32,12 +35,14 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // 2. Inicializamos la base de datos
+  // 1. Inicializamos base de datos (tablas y admin por defecto)
   initDB()
 
-  // 3. Registramos todos los handlers modulares
+  // 2. Registramos Handlers IPC
   registerWindowHandlers(mainWindow)
+  registerAuthHandlers()
 
+  // Carga de la aplicación
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
