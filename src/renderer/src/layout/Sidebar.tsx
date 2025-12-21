@@ -1,10 +1,11 @@
 import { cn } from '@/lib/utils'
 import { useAuth } from '../context/AuthContext'
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Settings, LogOut, User, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Settings, LogOut, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { FLAGS } from '../config/flags'
 
 interface SidebarProps {
   className?: string
@@ -28,7 +29,6 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
         className
       )}
     >
-      {/* Header / Logo Section */}
       <div className="h-16 flex items-center px-6 mb-2">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-md shadow-primary/20">
@@ -44,7 +44,6 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
 
       <Separator className="mx-4 w-auto bg-border/50" />
 
-      {/* Navigation Section */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => (
           <NavLink
@@ -74,7 +73,6 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
                     {isActive && <ChevronRight className="h-3 w-3 opacity-50" />}
                   </>
                 )}
-                {/* Indicador lateral activo */}
                 {isActive && <div className="absolute left-0 w-1 h-5 bg-primary rounded-r-full" />}
               </>
             )}
@@ -82,46 +80,47 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
         ))}
       </nav>
 
-      {/* Footer / User Section */}
-      <div className="p-3 mt-auto">
-        <div
-          className={cn(
-            'flex items-center gap-3 p-2 rounded-lg bg-secondary/30 border border-border/40',
-            collapsed ? 'justify-center' : 'px-3'
-          )}
-        >
-          <Avatar className="h-8 w-8 border border-border">
-            <AvatarImage src="" />
-            <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">
-              {user?.nombre?.charAt(0)}
-              {user?.apellido?.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+      {FLAGS.ENABLE_AUTH && (
+        <div className="p-3 mt-auto">
+          <div
+            className={cn(
+              'flex items-center gap-3 p-2 rounded-lg bg-secondary/30 border border-border/40',
+              collapsed ? 'justify-center' : 'px-3'
+            )}
+          >
+            <Avatar className="h-8 w-8 border border-border">
+              <AvatarImage src="" />
+              <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">
+                {user?.nombre?.charAt(0)}
+                {user?.apellido?.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
 
-          {!collapsed && (
-            <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs font-semibold text-foreground truncate">
-                {user?.nombre} {user?.apellido}
-              </span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
-                {user?.level === 1 ? 'Administrator' : 'Staff'}
-              </span>
-            </div>
-          )}
+            {!collapsed && (
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-xs font-semibold text-foreground truncate">
+                  {user?.nombre} {user?.apellido}
+                </span>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                  {user?.level === 1 ? 'Administrator' : 'Staff'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <Button
+            variant="ghost"
+            onClick={logout}
+            className={cn(
+              'w-full mt-2 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors gap-3 justify-start px-3',
+              collapsed && 'justify-center px-0'
+            )}
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            {!collapsed && <span className="text-xs font-medium">Cerrar Sesión</span>}
+          </Button>
         </div>
-
-        <Button
-          variant="ghost"
-          onClick={logout}
-          className={cn(
-            'w-full mt-2 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors gap-3 justify-start px-3',
-            collapsed && 'justify-center px-0'
-          )}
-        >
-          <LogOut className="h-4 w-4 shrink-0" />
-          {!collapsed && <span className="text-xs font-medium">Cerrar Sesión</span>}
-        </Button>
-      </div>
+      )}
     </aside>
   )
 }

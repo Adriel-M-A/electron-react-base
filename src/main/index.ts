@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { FLAGS } from './config'
 
 // Importaciones de base de datos y handlers
 import { initDB } from './database'
@@ -40,7 +41,10 @@ function createWindow(): void {
 
   // 2. Registramos Handlers IPC
   registerWindowHandlers(mainWindow)
-  registerAuthHandlers()
+
+  if (FLAGS.ENABLE_AUTH) {
+    registerAuthHandlers()
+  }
 
   // Carga de la aplicación
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {

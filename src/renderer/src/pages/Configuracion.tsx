@@ -1,15 +1,18 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { User, Shield, Users, Palette } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { FLAGS } from '../config/flags'
 
-// Importación de los componentes de pestaña que creamos
-// Asegúrate de que las rutas coincidan con tu estructura de carpetas
+// Importación de los componentes
 import { Cuenta } from './configuracion/Cuenta'
 import { Usuarios } from './configuracion/Usuarios'
 import Apariencia from './configuracion/Apariencia'
 
 export default function Configuracion() {
   const { isAdmin } = useAuth()
+
+  // Si Auth está activo iniciamos en 'cuenta', si no, en 'apariencia'
+  const defaultTab = FLAGS.ENABLE_AUTH ? 'cuenta' : 'apariencia'
 
   return (
     <div className="p-8 h-full flex flex-col space-y-6 overflow-hidden bg-background">
@@ -22,23 +25,27 @@ export default function Configuracion() {
         </p>
       </div>
 
-      <Tabs defaultValue="cuenta" className="flex-1 flex flex-col overflow-hidden">
+      <Tabs defaultValue={defaultTab} className="flex-1 flex flex-col overflow-hidden">
         {/* Navegación de Pestañas Estilizada */}
         <TabsList className="justify-start bg-transparent border-b rounded-none h-auto p-0 space-x-6 w-full">
-          <TabsTrigger value="cuenta" className="tabs-trigger-style">
-            <User className="h-4 w-4 mr-2" /> Cuenta
-          </TabsTrigger>
+          {FLAGS.ENABLE_AUTH && (
+            <TabsTrigger value="cuenta" className="tabs-trigger-style">
+              <User className="h-4 w-4 mr-2" /> Cuenta
+            </TabsTrigger>
+          )}
 
           <TabsTrigger value="apariencia" className="tabs-trigger-style">
             <Palette className="h-4 w-4 mr-2" /> Apariencia
           </TabsTrigger>
 
-          <TabsTrigger value="seguridad" className="tabs-trigger-style">
-            <Shield className="h-4 w-4 mr-2" /> Seguridad
-          </TabsTrigger>
+          {FLAGS.ENABLE_AUTH && (
+            <TabsTrigger value="seguridad" className="tabs-trigger-style">
+              <Shield className="h-4 w-4 mr-2" /> Seguridad
+            </TabsTrigger>
+          )}
 
-          {/* Tab condicional: Solo visible para administradores */}
-          {isAdmin && (
+          {/* Tab condicional: Solo visible si Auth activo y es Admin */}
+          {FLAGS.ENABLE_AUTH && isAdmin && (
             <TabsTrigger value="usuarios" className="tabs-trigger-style">
               <Users className="h-4 w-4 mr-2" /> Usuarios
             </TabsTrigger>
@@ -47,22 +54,25 @@ export default function Configuracion() {
 
         {/* Contenido de las Pestañas con Scroll independiente */}
         <div className="flex-1 overflow-y-auto pt-6 custom-scrollbar">
-          <TabsContent value="cuenta" className="m-0 outline-none">
-            <Cuenta />
-          </TabsContent>
+          {FLAGS.ENABLE_AUTH && (
+            <TabsContent value="cuenta" className="m-0 outline-none">
+              <Cuenta />
+            </TabsContent>
+          )}
 
           <TabsContent value="apariencia" className="m-0 outline-none">
             <Apariencia />
           </TabsContent>
 
-          <TabsContent value="seguridad" className="m-0 outline-none">
-            {/* Aquí puedes crear luego un componente Seguridad.tsx o poner el contenido directo */}
-            <div className="p-4 border rounded-lg border-dashed border-muted-foreground/20 text-center text-muted-foreground">
-              Las opciones de seguridad y cambio de contraseña estarán disponibles próximamente.
-            </div>
-          </TabsContent>
+          {FLAGS.ENABLE_AUTH && (
+            <TabsContent value="seguridad" className="m-0 outline-none">
+              <div className="p-4 border rounded-lg border-dashed border-muted-foreground/20 text-center text-muted-foreground">
+                Las opciones de seguridad y cambio de contraseña estarán disponibles próximamente.
+              </div>
+            </TabsContent>
+          )}
 
-          {isAdmin && (
+          {FLAGS.ENABLE_AUTH && isAdmin && (
             <TabsContent value="usuarios" className="m-0 outline-none">
               <Usuarios />
             </TabsContent>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { FLAGS } from '../config/flags'
 
 interface User {
   id: number
@@ -20,10 +21,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
 
-  // Si no hay usuario, estamos en modo login
   const isLogin = !user
 
   useEffect(() => {
+    if (!FLAGS.ENABLE_AUTH) {
+      setUser({
+        id: 0,
+        nombre: 'Sistema',
+        apellido: 'Admin',
+        level: 1
+      })
+      window.api.window.setAppSize()
+      return
+    }
+
     const savedUser = localStorage.getItem('user_session')
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser)
@@ -48,6 +59,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const logout = () => {
+    if (!FLAGS.ENABLE_AUTH) return
+
     setUser(null)
     localStorage.removeItem('user_session')
     window.api.window.setLoginSize()
