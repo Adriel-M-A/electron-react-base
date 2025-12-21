@@ -1,8 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { User, Shield, Users, Lock } from 'lucide-react'
+import { User, Shield, Users, Lock, KeyRound } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Cuenta } from './perfil/Cuenta'
 import { Usuarios } from './perfil/Usuarios'
+import { Permisos } from './perfil/Permisos'
 
 export default function Perfil() {
   const { isAdmin } = useAuth()
@@ -27,9 +28,15 @@ export default function Perfil() {
           </TabsTrigger>
 
           {isAdmin && (
-            <TabsTrigger value="usuarios" className="tabs-trigger-style">
-              <Users className="h-4 w-4 mr-2" /> Gestión de Usuarios
-            </TabsTrigger>
+            <>
+              <TabsTrigger value="usuarios" className="tabs-trigger-style">
+                <Users className="h-4 w-4 mr-2" /> Gestión de Usuarios
+              </TabsTrigger>
+
+              <TabsTrigger value="permisos" className="tabs-trigger-style">
+                <KeyRound className="h-4 w-4 mr-2" /> Permisos
+              </TabsTrigger>
+            </>
           )}
         </TabsList>
 
@@ -41,15 +48,25 @@ export default function Perfil() {
           <TabsContent value="seguridad" className="m-0 outline-none">
             <div className="p-4 border rounded-lg border-dashed border-muted-foreground/20 text-center text-muted-foreground">
               <Shield className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Aquí puedes poner opciones avanzadas como 2FA o sesiones activas.</p>
-              <p className="text-xs mt-1">Tu contraseña ya se puede cambiar en "Mi Cuenta".</p>
+              <p>
+                Opciones avanzadas de seguridad (2FA, sesiones activas) estarán disponibles aquí.
+              </p>
+              <p className="text-xs mt-1">
+                Recuerda que puedes cambiar tu contraseña en la pestaña "Mi Cuenta".
+              </p>
             </div>
           </TabsContent>
 
           {isAdmin && (
-            <TabsContent value="usuarios" className="m-0 outline-none">
-              <Usuarios />
-            </TabsContent>
+            <>
+              <TabsContent value="usuarios" className="m-0 outline-none">
+                <Usuarios />
+              </TabsContent>
+
+              <TabsContent value="permisos" className="m-0 outline-none">
+                <Permisos />
+              </TabsContent>
+            </>
           )}
         </div>
       </Tabs>
