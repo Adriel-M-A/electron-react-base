@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { ShieldCheck, NotebookPen } from 'lucide-react'
-import { Spinner } from '@/components/ui/spinner' //
+import { Spinner } from '@/components/ui/spinner'
 
 export default function Login() {
   const { login } = useAuth()
@@ -15,14 +15,15 @@ export default function Login() {
     formState: { isSubmitting, errors }
   } = useForm({
     defaultValues: {
-      nombre: '',
+      usuario: '',
       password: ''
     }
   })
 
   const onSubmit = async (data: any) => {
     try {
-      const result = await login(data.nombre, data.password)
+      // Ahora usamos 'usuario' en lugar de 'nombre'
+      const result = await login(data.usuario, data.password)
       if (result.success) {
         toast.success('Acceso autorizado')
       } else {
@@ -59,11 +60,11 @@ export default function Login() {
               Usuario
             </label>
             <Input
-              {...register('nombre', { required: true })}
+              {...register('usuario', { required: true })}
               placeholder="Ingresa tu usuario"
               disabled={isSubmitting}
               className={`h-11 bg-secondary/30 border-input focus:ring-2 focus:ring-primary/50 transition-all ${
-                errors.nombre ? 'border-destructive' : ''
+                errors.usuario ? 'border-destructive' : ''
               }`}
             />
           </div>
