@@ -3,12 +3,12 @@ import { useAuth } from '../context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { LogIn, Loader2, ShieldCheck, NotebookPen } from 'lucide-react'
+import { ShieldCheck, NotebookPen } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner' //
 
 export default function Login() {
   const { login } = useAuth()
 
-  // React Hook Form para validación limpia
   const {
     register,
     handleSubmit,
@@ -35,12 +35,8 @@ export default function Login() {
 
   return (
     <div className="flex h-full w-full flex-col bg-background select-none overflow-hidden">
-      {/* Contenedor principal ajustado al tamaño 400x550.
-        Usamos las variables de tu main.css: bg-background, text-foreground, etc. 
-      */}
-
       <div className="flex flex-col items-center justify-center flex-1 px-8 pt-4">
-        {/* Logo minimalista con color Primary de main.css */}
+        {/* Logo Section */}
         <div className="mb-6 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-1000">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--primary),0.3)]">
             <NotebookPen className="h-8 w-8 text-primary-foreground" />
@@ -51,10 +47,12 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Formulario con React Hook Form */}
+        {/* Formulario */}
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full space-y-5 animate-in fade-in zoom-in duration-700"
+          className={`w-full space-y-5 animate-in fade-in zoom-in duration-700 transition-opacity ${
+            isSubmitting ? 'opacity-60 pointer-events-none' : 'opacity-100'
+          }`}
         >
           <div className="space-y-1.5">
             <label className="text-[11px] font-semibold text-muted-foreground uppercase ml-1">
@@ -88,12 +86,15 @@ export default function Login() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-11 w-full font-bold text-sm tracking-wide bg-primary hover:opacity-90 shadow-lg shadow-primary/20 active:scale-[0.97] transition-all"
+            className="h-11 w-full font-bold text-sm tracking-wide bg-primary hover:opacity-90 shadow-lg shadow-primary/20 active:scale-[0.97] transition-all relative overflow-hidden"
           >
             {isSubmitting ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <div className="flex items-center justify-center gap-2">
+                <Spinner size="sm" className="text-primary-foreground" />
+                <span className="animate-pulse">VERIFICANDO...</span>
+              </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <span>INICIAR SESIÓN</span>
                 <ShieldCheck className="h-4 w-4" />
               </div>
@@ -102,7 +103,6 @@ export default function Login() {
         </form>
       </div>
 
-      {/* Footer minimalista pegado al borde inferior */}
       <div className="p-6 flex flex-col items-center opacity-30">
         <div className="h-[1px] w-12 bg-border mb-3" />
         <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">
