@@ -6,7 +6,28 @@ import { Usuarios } from './perfil/Usuarios'
 import { Permisos } from './perfil/Permisos'
 
 export default function Perfil() {
-  const { isAdmin } = useAuth()
+  const { hasPermission } = useAuth()
+
+  // Verificamos permisos para cada pestaña
+  const pCuenta = hasPermission('perfil_cuenta')
+  const pSeguridad = hasPermission('perfil_seguridad')
+  const pUsuarios = hasPermission('perfil_usuarios')
+  const pPermisos = hasPermission('perfil_permisos')
+
+  // Calcular defaultTab (la primera que tenga acceso)
+  let defaultTab = ''
+  if (pCuenta) defaultTab = 'cuenta'
+  else if (pSeguridad) defaultTab = 'seguridad'
+  else if (pUsuarios) defaultTab = 'usuarios'
+  else if (pPermisos) defaultTab = 'permisos'
+
+  if (!defaultTab) {
+    return (
+      <div className="p-10 text-center text-muted-foreground">
+        Acceso restringido a esta sección.
+      </div>
+    )
+  }
 
   return (
     <div className="p-8 h-full flex flex-col space-y-6 overflow-hidden bg-background animate-in fade-in duration-500">
@@ -17,56 +38,60 @@ export default function Perfil() {
         </p>
       </div>
 
-      <Tabs defaultValue="cuenta" className="flex-1 flex flex-col overflow-hidden">
+      <Tabs defaultValue={defaultTab} className="flex-1 flex flex-col overflow-hidden">
         <TabsList className="justify-start bg-transparent border-b rounded-none h-auto p-0 space-x-6 w-full">
-          <TabsTrigger value="cuenta" className="tabs-trigger-style">
-            <User className="h-4 w-4 mr-2" /> Mi Cuenta
-          </TabsTrigger>
+          {pCuenta && (
+            <TabsTrigger value="cuenta" className="tabs-trigger-style">
+              <User className="h-4 w-4 mr-2" /> Mi Cuenta
+            </TabsTrigger>
+          )}
 
-          <TabsTrigger value="seguridad" className="tabs-trigger-style">
-            <Lock className="h-4 w-4 mr-2" /> Seguridad
-          </TabsTrigger>
+          {pSeguridad && (
+            <TabsTrigger value="seguridad" className="tabs-trigger-style">
+              <Lock className="h-4 w-4 mr-2" /> Seguridad
+            </TabsTrigger>
+          )}
 
-          {isAdmin && (
-            <>
-              <TabsTrigger value="usuarios" className="tabs-trigger-style">
-                <Users className="h-4 w-4 mr-2" /> Gestión de Usuarios
-              </TabsTrigger>
+          {/* Nota: pUsuarios ya requiere isAdmin en Permisos.tsx por defecto, pero lo reforzamos aquí */}
+          {pUsuarios && (
+            <TabsTrigger value="usuarios" className="tabs-trigger-style">
+              <Users className="h-4 w-4 mr-2" /> Gestión de Usuarios
+            </TabsTrigger>
+          )}
 
-              <TabsTrigger value="permisos" className="tabs-trigger-style">
-                <KeyRound className="h-4 w-4 mr-2" /> Permisos
-              </TabsTrigger>
-            </>
+          {pPermisos && (
+            <TabsTrigger value="permisos" className="tabs-trigger-style">
+              <KeyRound className="h-4 w-4 mr-2" /> Permisos
+            </TabsTrigger>
           )}
         </TabsList>
 
         <div className="flex-1 overflow-y-auto pt-6 custom-scrollbar">
-          <TabsContent value="cuenta" className="m-0 outline-none">
-            <Cuenta />
-          </TabsContent>
+          {pCuenta && (
+            <TabsContent value="cuenta" className="m-0 outline-none">
+              <Cuenta />
+            </TabsContent>
+          )}
 
-          <TabsContent value="seguridad" className="m-0 outline-none">
-            <div className="p-4 border rounded-lg border-dashed border-muted-foreground/20 text-center text-muted-foreground">
-              <Shield className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>
-                Opciones avanzadas de seguridad (2FA, sesiones activas) estarán disponibles aquí.
-              </p>
-              <p className="text-xs mt-1">
-                Recuerda que puedes cambiar tu contraseña en la pestaña "Mi Cuenta".
-              </p>
-            </div>
-          </TabsContent>
+          {pSeguridad && (
+            <TabsContent value="seguridad" className="m-0 outline-none">
+              <div className="p-4 border rounded-lg border-dashed border-muted-foreground/20 text-center text-muted-foreground">
+                <Shield className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>Opciones avanzadas de seguridad.</p>
+              </div>
+            </TabsContent>
+          )}
 
-          {isAdmin && (
-            <>
-              <TabsContent value="usuarios" className="m-0 outline-none">
-                <Usuarios />
-              </TabsContent>
+          {pUsuarios && (
+            <TabsContent value="usuarios" className="m-0 outline-none">
+              <Usuarios />
+            </TabsContent>
+          )}
 
-              <TabsContent value="permisos" className="m-0 outline-none">
-                <Permisos />
-              </TabsContent>
-            </>
+          {pPermisos && (
+            <TabsContent value="permisos" className="m-0 outline-none">
+              <Permisos />
+            </TabsContent>
           )}
         </div>
       </Tabs>

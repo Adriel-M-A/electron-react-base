@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { useAuth } from '../context/AuthContext'
-import { NavLink, useNavigate } from 'react-router-dom' // Importamos useNavigate
+import { NavLink, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Settings, LogOut, ChevronRight, ChevronsRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -14,18 +14,26 @@ interface SidebarProps {
 }
 
 export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate() // Hook para navegar
+  const { user, logout, hasPermission } = useAuth()
+  const navigate = useNavigate()
 
-  const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Configuración', path: '/configuracion', icon: Settings }
+  // Definimos los items con su ID de permiso requerido
+  const allNavItems = [
+    { name: 'Dashboard', path: '/', icon: LayoutDashboard, permission: 'dashboard' },
+    { name: 'Configuración', path: '/configuracion', icon: Settings, permission: 'configuracion' }
   ]
 
-  // Función para ir al perfil
+  // Filtramos: Solo mostramos si tiene permiso
+  const visibleNavItems = allNavItems.filter((item) => hasPermission(item.permission))
+
+  // Solo permitimos click en el perfil si tiene permiso a la sección 'perfil'
+  const canAccessProfile = hasPermission('perfil')
+
   const handleProfileClick = () => {
-    navigate('/perfil')
-    if (onMobileClick) onMobileClick()
+    if (canAccessProfile) {
+      navigate('/perfil')
+      if (onMobileClick) onMobileClick()
+    }
   }
 
   return (
@@ -52,7 +60,7 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
       <Separator className="mx-4 w-auto bg-border/50" />
 
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
@@ -89,14 +97,17 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
 
       {FLAGS.ENABLE_AUTH && (
         <div className="p-3 mt-auto space-y-2">
-          {/* Tarjeta de Usuario Clickable */}
+          {/* Tarjeta de Usuario: Condicionalmente Clickable */}
           <div
             onClick={handleProfileClick}
             className={cn(
-              'flex items-center gap-3 p-2 rounded-lg bg-secondary/30 border border-border/40 cursor-pointer hover:bg-secondary/80 transition-colors group',
+              'flex items-center gap-3 p-2 rounded-lg bg-secondary/30 border border-border/40 transition-colors group',
+              canAccessProfile
+                ? 'cursor-pointer hover:bg-secondary/80'
+                : 'cursor-default opacity-80',
               collapsed ? 'justify-center' : 'px-3'
             )}
-            title="Ir a mi perfil"
+            title={canAccessProfile ? 'Ir a mi perfil' : ''}
           >
             <Avatar className="h-8 w-8 border border-border group-hover:border-primary/50 transition-colors">
               <AvatarImage src="" />
@@ -116,7 +127,9 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
                     {user?.level === 1 ? 'Administrator' : 'Staff'}
                   </span>
                 </div>
-                <ChevronsRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                {canAccessProfile && (
+                  <ChevronsRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
               </>
             )}
           </div>

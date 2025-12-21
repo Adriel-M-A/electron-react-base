@@ -22,13 +22,41 @@ interface AuthContextType {
   logout: () => void
   isAdmin: boolean
   isLogin: boolean
+  // NUEVO: Función para verificar permisos
+  hasPermission: (permissionId: string) => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [permissions, setPermissions] = useState<string[]>([]) // Almacena los permisos cargados
+
   const isLogin = !user
+
+  // Función auxiliar para cargar permisos desde la BD
+  const loadUserPermissions = async (userLevel: number) => {
+    // Si es Admin (1), no necesitamos cargar nada, tiene pase libre
+    if (userLevel === 1) {
+      setPermissions(['*'])
+      return
+    }
+
+    try {
+      const result = await window.api.roles.getAll()
+      if (result.success) {
+        const myRole = result.roles.find((r: any) => r.id === userLevel)
+        if (myRole) {
+          setPermissions(myRole.permissions)
+        } else {
+          setPermissions([])
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando permisos', error)
+      setPermissions([])
+    }
+  }
 
   useEffect(() => {
     if (!FLAGS.ENABLE_AUTH) {
@@ -47,6 +75,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser)
       setUser(parsedUser)
+      loadUserPermissions(parsedUser.level) // <--- Cargar permisos al recargar
       window.api.window.setAppSize()
     } else {
       window.api.window.setLoginSize()
@@ -57,6 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const response = await window.api.auth.login({ usuario, password })
     if (response.success && response.user) {
       setUser(response.user)
+      loadUserPermissions(response.user.level) // <--- Cargar permisos al login
       localStorage.setItem('user_session', JSON.stringify(response.user))
       window.api.window.setAppSize()
       return { success: true }
@@ -71,12 +101,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const newUser = { ...user, ...response.user }
       setUser(newUser)
       localStorage.setItem('user_session', JSON.stringify(newUser))
+
+      // Si el nivel cambió, recargamos permisos
+      if (response.user.level !== user.level) {
+        loadUserPermissions(response.user.level)
+      }
       return true
     }
     return false
   }
 
-  // NUEVA FUNCIÓN
   const changePassword = async (currentPass: string, newPass: string) => {
     if (!user) return { success: false, message: 'No hay sesión' }
     return await window.api.auth.changePassword(user.id, currentPass, newPass)
@@ -85,15 +119,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     if (!FLAGS.ENABLE_AUTH) return
     setUser(null)
+    setPermissions([])
     localStorage.removeItem('user_session')
     window.api.window.setLoginSize()
   }
 
   const isAdmin = user?.level === 1
 
+  // Lógica principal de verificación
+  const hasPermission = (permissionId: string): boolean => {
+    // Si no hay Auth, asumimos acceso total (modo desarrollo/venta simple)
+    if (!FLAGS.ENABLE_AUTH) return true
+
+    // Si es Admin, acceso total siempre
+    if (isAdmin) return true
+
+    // Verificar si el permiso está en la lista
+    return permissions.includes(permissionId)
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, updateProfile, changePassword, isAdmin, isLogin }}
+      value={{
+        user,
+        login,
+        logout,
+        updateProfile,
+        changePassword,
+        isAdmin,
+        isLogin,
+        hasPermission
+      }}
     >
       {children}
     </AuthContext.Provider>
