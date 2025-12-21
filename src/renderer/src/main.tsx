@@ -1,10 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { ThemeProvider } from 'next-themes'
 import App from './App'
 import './assets/main.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <App />
+    </ThemeProvider>
   </React.StrictMode>
 )

@@ -1,114 +1,82 @@
 @import 'tailwindcss';
-@plugin 'tailwindcss-animate';
 
-@custom-variant dark (&:where(.dark, .dark *));
+@plugin "tailwindcss-animate";
 
-/* CONFIGURACIÓN DE TEMA (Tailwind v4) */
+@custom-variant dark (&:is(.dark *));
+
 @theme {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+  /* --- MODO CLARO (Default) --- */
+  /* Definimos los tokens base que Tailwind usará para generar las utilidades */
+  --color-background: hsl(210 20% 98%);
+  --color-foreground: hsl(224 71.4% 4.1%);
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(224 71.4% 4.1%);
 
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(220.9 39.3% 11%);
+  --color-primary-foreground: hsl(210 20% 98%);
 
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(220 14.3% 95.9%);
+  --color-secondary-foreground: hsl(220.9 39.3% 11%);
 
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(220 14.3% 95.9%);
+  --color-muted-foreground: hsl(220 8.9% 46.1%);
 
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(220 13% 91%);
+  --color-input: hsl(220 13% 91%);
 
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-sidebar: hsl(0 0% 98%);
+  --color-sidebar-foreground: hsl(240 5.3% 26.1%);
+  --color-sidebar-border: hsl(220 13% 91%);
 
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-}
-
-/* PALETA DE COLORES MAESTRA - TEMA "PRO SALES"
-   Basado en la estrategia de 5 colores.
-*/
-:root {
-  /* COLOR 1: EL LIENZO (Fondo suave, no blanco puro para descansar la vista) */
-  --background: 210 40% 98%; /* Slate-50 */
-  --foreground: 222 47% 11%; /* Texto principal: Azul muy oscuro, casi negro */
-
-  /* COLOR 2: LA SUPERFICIE (Donde vive el contenido: Productos, Carrito) */
-  --card: 0 0% 100%; /* Blanco puro para máximo contraste con el contenido */
-  --card-foreground: 222 47% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-
-  /* COLOR 3: EL ACENTO (Botones, Precios, Acciones) -> Azul Royal Vibrante */
-  --primary: 221 83% 53%; /* Blue-600: Vibrante y confiable */
-  --primary-foreground: 210 40% 98%; /* Texto blanco sobre azul */
-
-  /* COLOR 4: LA ESTRUCTURA (Sidebar Oscuro para jerarquía) */
-  --sidebar: 222 47% 11%; /* Slate-900: Muy oscuro, elegante */
-  --sidebar-foreground: 210 40% 98%; /* Texto claro en sidebar */
-  --sidebar-accent: 217 33% 17%; /* Hover en sidebar (un poco más claro) */
-  --sidebar-accent-foreground: 210 40% 98%;
-
-  /* COLOR 5: EL DETALLE (Bordes y Elementos Secundarios) */
-  --muted: 210 40% 96.1%; /* Fondo gris muy suave para items alternos/hovers */
-  --muted-foreground: 215 16% 47%; /* Texto secundario (gris medio) */
-
-  --border: 220 13% 95%; /* Bordes sutiles */
-  --input: 214 32% 91%;
-  --ring: 221 83% 53%; /* Anillo de foco igual al primario */
-
-  /* Colores Auxiliares */
-  --secondary: 210 40% 96.1%; /* Botones secundarios (gris claro) */
-  --secondary-foreground: 222 47% 11%;
-
-  --accent: 210 40% 96.1%; /* Similar a secondary, para listas */
-  --accent-foreground: 222 47% 11%;
-
-  --destructive: 0 84% 60%; /* Rojo suave pero alerta para Cancelar/Borrar */
-  --destructive-foreground: 210 40% 98%;
-
-  --radius: 0.5rem; /* Bordes redondeados modernos (8px) */
-}
-
-body {
-  @apply bg-background text-foreground;
-  font-family: 'Inter', sans-serif;
-  border-color: var(--border);
+  --radius-lg: 0.6rem;
 }
 
 @layer base {
-  html,
-  body,
-  #root {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
+  /* --- MODO OSCURO (Anidado correctamente) --- */
+  /* Redefinimos las variables CSS cuando la clase .dark está presente */
+  .dark {
+    --color-background: hsl(222 47% 7%);
+    --color-foreground: hsl(213 31% 91%);
+
+    --color-card: hsl(222 47% 10%);
+    --color-card-foreground: hsl(213 31% 91%);
+
+    --color-primary: hsl(217 91% 60%);
+    --color-primary-foreground: hsl(210 20% 98%);
+
+    --color-secondary: hsl(217 32% 17%);
+    --color-secondary-foreground: hsl(210 20% 98%);
+
+    --color-muted: hsl(217 32% 17%);
+    --color-muted-foreground: hsl(215 20% 65%);
+
+    --color-border: hsl(217 32% 17%);
+    --color-input: hsl(217 32% 17%);
+
+    --color-sidebar: hsl(222 47% 8%);
+    --color-sidebar-foreground: hsl(215 20% 65%);
+    --color-sidebar-border: hsl(217 32% 15%);
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
   }
 }
 
-.drag-region {
-  -webkit-app-region: drag;
-}
-.no-drag {
-  -webkit-app-region: no-drag;
+@layer components {
+  .tabs-trigger-style {
+    @apply data-[state=active]:border-primary data-[state=active]:text-primary 
+           border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 
+           text-sm font-medium text-muted-foreground transition-all;
+  }
+  .titlebar-drag {
+    -webkit-app-region: drag;
+  }
+  .titlebar-nodrag {
+    -webkit-app-region: no-drag;
+  }
 }

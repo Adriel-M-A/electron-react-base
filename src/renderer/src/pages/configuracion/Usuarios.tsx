@@ -9,8 +9,7 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Users, Trash2, UserPlus } from 'lucide-react'
-import { toast } from 'sonner'
+import { Trash2, UserPlus } from 'lucide-react'
 
 export function Usuarios() {
   const [usuarios, setUsuarios] = useState<any[]>([])
