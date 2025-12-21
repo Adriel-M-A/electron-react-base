@@ -27,4 +27,15 @@ export function registerAuthHandlers(): void {
       return { success: false, error: errorMessage }
     }
   })
+
+  // Obtener lista de usuarios
+  ipcMain.handle('auth:get-users', async () => {
+    try {
+      const users = await UserQueries.obtenerUsuarios()
+      return { success: true, users }
+    } catch (error) {
+      console.error('Error al obtener usuarios:', error)
+      return { success: false, users: [] }
+    }
+  })
 }

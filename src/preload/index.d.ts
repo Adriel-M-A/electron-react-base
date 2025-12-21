@@ -24,6 +24,7 @@ declare global {
           password: string
           level: number
         }) => Promise<{ success: boolean; error?: string }>
+        getUsers: () => Promise<{ success: boolean; users: any[] }>
       }
     }
   }

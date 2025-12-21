@@ -83,5 +83,17 @@ export const UserQueries = {
     // 3. Actualizar
     db.prepare('UPDATE usuarios SET password = ? WHERE id = ?').run(hashedNewPassword, id)
     return { success: true }
+  },
+
+  obtenerUsuarios() {
+    return db
+      .prepare(
+        `
+      SELECT id, nombre, apellido, usuario, level, last_login, created_at 
+      FROM usuarios 
+      ORDER BY created_at DESC
+    `
+      )
+      .all() as Omit<Usuario, 'password'>[]
   }
 }

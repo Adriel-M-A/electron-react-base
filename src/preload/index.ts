@@ -13,7 +13,8 @@ const api = {
     createUser: (userData) => ipcRenderer.invoke('auth:create-user', userData),
     updateUser: (id, data) => ipcRenderer.invoke('auth:update-user', { id, data }),
     changePassword: (id, currentPassword, newPassword) =>
-      ipcRenderer.invoke('auth:change-password', { id, currentPassword, newPassword })
+      ipcRenderer.invoke('auth:change-password', { id, currentPassword, newPassword }),
+    getUsers: () => ipcRenderer.invoke('auth:get-users')
   }
 }
 
