@@ -5,6 +5,8 @@ import Login from './pages/Login'
 import { Toaster } from '@/components/ui/sonner'
 import TitleBar from './layout/TitleBar'
 import Configuracion from './pages/Configuracion'
+import Perfil from './pages/Perfil' // <--- Importamos Perfil
+import { FLAGS } from './config/flags' // <--- Importamos Flags
 
 const RootRoutes = () => {
   const { user } = useAuth()
@@ -26,6 +28,9 @@ const RootRoutes = () => {
                 element={<div className="p-10 text-2xl font-bold">Panel de Inicio</div>}
               />
               <Route path="/configuracion" element={<Configuracion />} />
+
+              {/* RUTA CONDICIONAL DE PERFIL */}
+              {FLAGS.ENABLE_AUTH && <Route path="/perfil" element={<Perfil />} />}
 
               <Route
                 path="*"

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { useAuth } from '../context/AuthContext'
-import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Settings, LogOut, ChevronRight } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom' // Importamos useNavigate
+import { LayoutDashboard, Settings, LogOut, ChevronRight, ChevronsRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -15,11 +15,18 @@ interface SidebarProps {
 
 export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
   const { user, logout } = useAuth()
+  const navigate = useNavigate() // Hook para navegar
 
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Configuración', path: '/configuracion', icon: Settings }
   ]
+
+  // Función para ir al perfil
+  const handleProfileClick = () => {
+    navigate('/perfil')
+    if (onMobileClick) onMobileClick()
+  }
 
   return (
     <aside
@@ -81,14 +88,17 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
       </nav>
 
       {FLAGS.ENABLE_AUTH && (
-        <div className="p-3 mt-auto">
+        <div className="p-3 mt-auto space-y-2">
+          {/* Tarjeta de Usuario Clickable */}
           <div
+            onClick={handleProfileClick}
             className={cn(
-              'flex items-center gap-3 p-2 rounded-lg bg-secondary/30 border border-border/40',
+              'flex items-center gap-3 p-2 rounded-lg bg-secondary/30 border border-border/40 cursor-pointer hover:bg-secondary/80 transition-colors group',
               collapsed ? 'justify-center' : 'px-3'
             )}
+            title="Ir a mi perfil"
           >
-            <Avatar className="h-8 w-8 border border-border">
+            <Avatar className="h-8 w-8 border border-border group-hover:border-primary/50 transition-colors">
               <AvatarImage src="" />
               <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">
                 {user?.nombre?.charAt(0)}
@@ -97,14 +107,17 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
             </Avatar>
 
             {!collapsed && (
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-semibold text-foreground truncate">
-                  {user?.nombre} {user?.apellido}
-                </span>
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
-                  {user?.level === 1 ? 'Administrator' : 'Staff'}
-                </span>
-              </div>
+              <>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-xs font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                    {user?.nombre} {user?.apellido}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                    {user?.level === 1 ? 'Administrator' : 'Staff'}
+                  </span>
+                </div>
+                <ChevronsRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              </>
             )}
           </div>
 
@@ -112,9 +125,10 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
             variant="ghost"
             onClick={logout}
             className={cn(
-              'w-full mt-2 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors gap-3 justify-start px-3',
+              'w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors gap-3 justify-start px-3',
               collapsed && 'justify-center px-0'
             )}
+            title="Cerrar Sesión"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             {!collapsed && <span className="text-xs font-medium">Cerrar Sesión</span>}
