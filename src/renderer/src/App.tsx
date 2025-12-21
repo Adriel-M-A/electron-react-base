@@ -4,15 +4,14 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import { Toaster } from '@/components/ui/sonner'
 import TitleBar from './layout/TitleBar'
+import Configuracion from './pages/Configuracion'
 
 const RootRoutes = () => {
   const { user } = useAuth()
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      {/* La TitleBar siempre visible para poder cerrar/minimizar la app */}
       <TitleBar />
-
       <div className="flex-1 overflow-hidden">
         {!user ? (
           <Routes>
@@ -26,6 +25,8 @@ const RootRoutes = () => {
                 path="/"
                 element={<div className="p-10 text-2xl font-bold">Panel de Inicio</div>}
               />
+              <Route path="/configuracion" element={<Configuracion />} />
+
               <Route
                 path="*"
                 element={<div className="p-10 text-red-500">Página no encontrada</div>}

@@ -4,6 +4,6 @@ export const menuConfig = [
   {
     title: 'Configuración',
     icon: Settings,
-    href: '/settings'
+    href: '/configuracion'
   }
 ]
