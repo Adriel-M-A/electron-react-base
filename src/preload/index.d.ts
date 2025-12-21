@@ -25,6 +25,7 @@ declare global {
           level: number
         }) => Promise<{ success: boolean; error?: string }>
         getUsers: () => Promise<{ success: boolean; users: any[] }>
+        deleteUser: (id: number) => Promise<{ success: boolean; error?: string }>
       }
     }
   }

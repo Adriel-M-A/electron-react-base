@@ -17,6 +17,10 @@ export function registerAuthHandlers(): void {
     return await UserQueries.cambiarPassword(id, currentPassword, newPassword)
   })
 
+  ipcMain.handle('auth:delete-user', async (_, id) => {
+    return await UserQueries.eliminarUsuario(id)
+  })
+
   // Crear usuario
   ipcMain.handle('auth:create-user', async (_, userData) => {
     const { nombre, apellido, usuario, password, level } = userData

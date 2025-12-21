@@ -3,6 +3,12 @@ import bcrypt from 'bcrypt'
 
 const SALT_ROUNDS = 10
 
+// Helper para capitalizar (ej: "juan" -> "Juan")
+const capitalize = (text: string) => {
+  if (!text) return ''
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+}
+
 // Interfaz actualizada
 interface Usuario {
   id: number
@@ -38,17 +44,38 @@ export const UserQueries = {
   },
 
   async actualizarUsuario(id: number, data: Partial<Usuario>) {
-    const { nombre, apellido, usuario } = data
+    const { nombre, apellido, usuario, level, password } = data
+
+    // APLICAMOS CAPITALIZACIÓN AQUÍ
+    const nombreCap = nombre ? capitalize(nombre) : undefined
+    const apellidoCap = apellido ? capitalize(apellido) : undefined
+
     try {
-      db.prepare(
+      if (password && password.trim() !== '') {
+        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS)
+        db.prepare(
+          `
+          UPDATE usuarios 
+          SET nombre = COALESCE(?, nombre),
+              apellido = COALESCE(?, apellido),
+              usuario = COALESCE(?, usuario),
+              level = COALESCE(?, level),
+              password = ?
+          WHERE id = ?
         `
-        UPDATE usuarios 
-        SET nombre = COALESCE(?, nombre),
-            apellido = COALESCE(?, apellido),
-            usuario = COALESCE(?, usuario)
-        WHERE id = ?
-      `
-      ).run(nombre, apellido, usuario, id)
+        ).run(nombreCap, apellidoCap, usuario, level, hashedPassword, id)
+      } else {
+        db.prepare(
+          `
+          UPDATE usuarios 
+          SET nombre = COALESCE(?, nombre),
+              apellido = COALESCE(?, apellido),
+              usuario = COALESCE(?, usuario),
+              level = COALESCE(?, level)
+          WHERE id = ?
+        `
+        ).run(nombreCap, apellidoCap, usuario, level, id)
+      }
 
       const updatedUser = db
         .prepare(
@@ -57,17 +84,50 @@ export const UserQueries = {
         .get(id)
       return { success: true, user: updatedUser }
     } catch (error) {
-      return { success: false, message: 'Error al actualizar (quizás el usuario ya existe)' }
+      return { success: false, message: 'El nombre de usuario ya está en uso' }
     }
   },
 
   async crearUsuario(nombre, apellido, usuario, password, level) {
+    // APLICAMOS CAPITALIZACIÓN AQUÍ
+    const nombreCap = capitalize(nombre)
+    const apellidoCap = capitalize(apellido)
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS)
-    const stmt = db.prepare(`
-      INSERT INTO usuarios (nombre, apellido, usuario, password, level)
-      VALUES (?, ?, ?, ?, ?)
-    `)
-    return stmt.run(nombre, apellido, usuario, hashedPassword, level)
+
+    try {
+      const stmt = db.prepare(`
+        INSERT INTO usuarios (nombre, apellido, usuario, password, level)
+        VALUES (?, ?, ?, ?, ?)
+      `)
+
+      const info = stmt.run(nombreCap, apellidoCap, usuario, hashedPassword, level)
+      return { success: true, id: info.lastInsertRowid }
+    } catch (error: any) {
+      console.error('Error al crear usuario:', error)
+      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        return { success: false, message: 'El nombre de usuario ya existe' }
+      }
+      return { success: false, message: 'Error en la base de datos' }
+    }
+  },
+
+  async eliminarUsuario(id: number) {
+    try {
+      // Opcional: Evitar borrar al último admin, pero por ahora simple:
+      // Evitar borrar al usuario ID 1 (Admin por defecto) si quieres seguridad extra
+      if (id === 1) {
+        return { success: false, message: 'No se puede eliminar al Administrador Principal' }
+      }
+
+      const info = db.prepare('DELETE FROM usuarios WHERE id = ?').run(id)
+
+      if (info.changes > 0) {
+        return { success: true }
+      }
+      return { success: false, message: 'Usuario no encontrado' }
+    } catch (error) {
+      return { success: false, message: 'Error al eliminar usuario' }
+    }
   },
 
   async cambiarPassword(id: number, currentPassword, newPassword) {

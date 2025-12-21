@@ -14,7 +14,8 @@ const api = {
     updateUser: (id, data) => ipcRenderer.invoke('auth:update-user', { id, data }),
     changePassword: (id, currentPassword, newPassword) =>
       ipcRenderer.invoke('auth:change-password', { id, currentPassword, newPassword }),
-    getUsers: () => ipcRenderer.invoke('auth:get-users')
+    getUsers: () => ipcRenderer.invoke('auth:get-users'),
+    deleteUser: (id) => ipcRenderer.invoke('auth:delete-user', id)
   }
 }
 
