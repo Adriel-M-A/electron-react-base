@@ -1,6 +1,13 @@
 import { db } from '../../core/database'
 import bcrypt from 'bcrypt'
 
+// FUNCIÓN DE AYUDA (Helper)
+// Convierte "juAN" -> "Juan"
+const formatName = (text: string): string => {
+  if (!text) return text
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+}
+
 export const AuthService = {
   // --- USUARIOS ---
   login: (usuario: string, password: string) => {
@@ -25,6 +32,11 @@ export const AuthService = {
 
   createUser: (data: any) => {
     const { nombre, apellido, usuario, password, level } = data
+
+    // APLICAMOS EL FORMATO AQUÍ
+    const nombreFmt = formatName(nombre)
+    const apellidoFmt = formatName(apellido)
+
     try {
       const hashedPassword = bcrypt.hashSync(password, 10)
       const info = db
@@ -34,7 +46,9 @@ export const AuthService = {
         VALUES (?, ?, ?, ?, ?)
       `
         )
-        .run(nombre, apellido, usuario, hashedPassword, level)
+        // Usamos las variables formateadas (nombreFmt, apellidoFmt)
+        .run(nombreFmt, apellidoFmt, usuario, hashedPassword, level)
+
       return { success: true, id: info.lastInsertRowid }
     } catch (error: any) {
       if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
@@ -50,11 +64,13 @@ export const AuthService = {
 
     if (data.nombre) {
       updates.push('nombre = ?')
-      params.push(data.nombre)
+      // Aplicamos formato también al editar
+      params.push(formatName(data.nombre))
     }
     if (data.apellido) {
       updates.push('apellido = ?')
-      params.push(data.apellido)
+      // Aplicamos formato también al editar
+      params.push(formatName(data.apellido))
     }
     if (data.usuario) {
       updates.push('usuario = ?')
