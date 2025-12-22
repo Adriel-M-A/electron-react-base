@@ -7,12 +7,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Spinner } from '@/components/ui/spinner'
+} from '@ui/dialog'
+import { Button } from '@ui/button'
+import { Input } from '@ui/input'
+import { Spinner } from '@ui/spinner'
 import { toast } from 'sonner'
-import { User } from '@/context/AuthContext'
+import { User } from '../context/AuthContext'
 import { Shield, ShieldAlert, Eye, Save } from 'lucide-react'
 
 interface UsuarioFormProps {
@@ -96,7 +96,7 @@ export function UsuarioForm({ open, onOpenChange, userToEdit, onSuccess }: Usuar
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Editar Usuario' : 'Nuevo Usuario'}</DialogTitle>
           <DialogDescription>
@@ -227,7 +227,7 @@ export function UsuarioForm({ open, onOpenChange, userToEdit, onSuccess }: Usuar
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting} className="gap-2">
-              {isSubmitting ? <Spinner size="sm" /> : <Save className="h-4 w-4" />}
+              {isSubmitting ? <Spinner className="h-4 w-4" /> : <Save className="h-4 w-4" />}
               {isEditing ? 'Guardar Cambios' : 'Crear Usuario'}
             </Button>
           </DialogFooter>

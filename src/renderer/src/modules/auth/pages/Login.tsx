@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../context/AuthContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@ui/button'
+import { Input } from '@ui/input'
 import { toast } from 'sonner'
 import { ShieldCheck, NotebookPen } from 'lucide-react'
-import { Spinner } from '@/components/ui/spinner'
+import { Spinner } from '@ui/spinner'
 
 export default function Login() {
   const { login } = useAuth()
@@ -91,7 +91,7 @@ export default function Login() {
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center gap-2">
-                <Spinner size="sm" className="text-primary-foreground" />
+                <Spinner className="h-4 w-4 text-primary-foreground animate-spin" />
                 <span className="animate-pulse">VERIFICANDO...</span>
               </div>
             ) : (
@@ -105,7 +105,7 @@ export default function Login() {
       </div>
 
       <div className="p-6 flex flex-col items-center opacity-30">
-        <div className="h-[1px] w-12 bg-border mb-3" />
+        <div className="w-12 bg-border mb-3" />
         <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-widest">
           Terminal v1.0
         </span>

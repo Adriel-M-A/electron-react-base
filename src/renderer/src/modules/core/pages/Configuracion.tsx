@@ -1,7 +1,7 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/tabs'
 import { Palette, Database, Lock } from 'lucide-react'
 import Apariencia from './configuracion/Apariencia'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@auth/context/AuthContext'
 
 export default function Configuracion() {
   const { hasPermission } = useAuth()

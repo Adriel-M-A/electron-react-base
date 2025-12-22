@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Outlet } from 'react-router-dom'
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@ui/sheet'
+import { Button } from '@ui/button'
 import { Menu, NotebookPen } from 'lucide-react'
 
 export default function AppLayout() {
@@ -36,7 +36,7 @@ export default function AppLayout() {
               </Button>
             </SheetTrigger>
 
-            <SheetContent side="left" className="p-0 w-[280px] border-r-0 [&>button]:hidden">
+            <SheetContent side="left" className="p-0 w-70 border-r-0 [&>button]:hidden">
               <SheetTitle className="sr-only">Menú Principal</SheetTitle>
               <Sidebar
                 className="w-full h-full border-none"

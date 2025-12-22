@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import { FLAGS } from '../config/flags'
+import { FLAGS } from '@config/flags'
 
 export interface User {
   id: number

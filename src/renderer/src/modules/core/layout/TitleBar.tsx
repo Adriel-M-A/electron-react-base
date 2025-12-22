@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Minus, Square, X, Copy } from 'lucide-react'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@auth/context/AuthContext'
 
 export default function TitleBar(): React.ReactElement {
   const [isMaximized, setIsMaximized] = useState(true)

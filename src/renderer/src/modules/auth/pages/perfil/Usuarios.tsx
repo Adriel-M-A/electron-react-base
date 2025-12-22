@@ -1,21 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table'
+import { Button } from '@ui/button'
+import { Badge } from '@ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar'
 import { Plus, Search, Shield, ShieldAlert, Eye, Pencil, Trash2, AlertTriangle } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { User, useAuth } from '@/context/AuthContext'
+import { Input } from '@ui/input'
+import { User, useAuth } from '@auth/context/AuthContext'
 import { toast } from 'sonner'
-import { UsuarioForm } from '@/components/UsuarioForm'
+import { UsuarioForm } from '@auth/components/UsuarioForm'
 import {
   Dialog,
   DialogContent,
@@ -23,8 +16,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog'
-import { Spinner } from '@/components/ui/spinner'
+} from '@ui/dialog'
+import { Spinner } from '@ui/spinner'
 
 export function Usuarios() {
   const { user: currentUser } = useAuth()
@@ -137,7 +130,7 @@ export function Usuarios() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-12.5"></TableHead>
                 <TableHead>Nombre Completo</TableHead>
                 <TableHead>Usuario</TableHead>
                 <TableHead>Nivel</TableHead>
@@ -255,7 +248,7 @@ export function Usuarios() {
 
       {/* MODAL 2: CONFIRMACIÓN DE ELIMINAR */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="sm:max-w-[400px]">
+        <DialogContent className="sm:max-w-100">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
               <AlertTriangle className="h-5 w-5" />

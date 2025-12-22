@@ -1,17 +1,11 @@
 import { useState } from 'react'
-import { useAuth } from '@/context/AuthContext'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter
-} from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { useAuth } from '@auth/context/AuthContext'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar'
+import { Label } from '@ui/label'
+import { Input } from '@ui/input'
+import { Button } from '@ui/button'
+import { Separator } from '@ui/separator'
 import {
   Dialog,
   DialogContent,
@@ -20,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '@/components/ui/dialog'
+} from '@ui/dialog'
 import { toast } from 'sonner'
 import { Shield, ShieldAlert, Calendar, Clock, Save, X, Pencil, Lock } from 'lucide-react'
 
@@ -82,7 +76,7 @@ export function Cuenta() {
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       {/* TARJETA DE PERFIL PRINCIPAL */}
       <Card className="overflow-hidden border-border/50 shadow-sm">
-        <div className="h-24 bg-gradient-to-r from-primary/10 to-secondary/30" />
+        <div className="h-24 bg-linear-to-r from-primary/10 to-secondary/30" />
         <CardContent className="relative pt-0">
           <div className="flex flex-col md:flex-row items-start md:items-end gap-4 -mt-12 mb-4 px-2">
             <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
@@ -200,7 +194,7 @@ export function Cuenta() {
                   value={isEditing ? formData.nombre : user?.nombre}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
-                  className={!isEditing ? 'bg-muted/30 border-transparent' : 'bg-background'}
+                  className={!isEditing ? 'bg-muted/30' : 'bg-background'}
                 />
               </div>
               <div className="space-y-2">
@@ -270,7 +264,7 @@ export function Cuenta() {
               </div>
             </div>
 
-            <div className="h-[1px] bg-border/50 w-full" />
+            <Separator />
 
             <div className="flex items-start gap-4">
               <div className="p-2 rounded-md bg-secondary text-secondary-foreground">

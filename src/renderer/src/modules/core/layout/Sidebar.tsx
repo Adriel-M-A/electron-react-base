@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@auth/context/AuthContext'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Settings, LogOut, ChevronRight, ChevronsRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { FLAGS } from '../config/flags'
+import { Button } from '@ui/button'
+import { Separator } from '@ui/separator'
+import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar'
+import { FLAGS } from '@config/flags'
 
 interface SidebarProps {
   className?: string
@@ -40,7 +40,7 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
     <aside
       className={cn(
         'flex flex-col bg-sidebar border-r border-border transition-all duration-300 ease-in-out',
-        collapsed ? 'w-[70px]' : 'w-[260px]',
+        collapsed ? 'w-17.5' : 'w-65',
         className
       )}
     >

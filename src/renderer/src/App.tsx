@@ -1,12 +1,16 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
-import AppLayout from './layout/AppLayout'
-import { AuthProvider, useAuth } from './context/AuthContext'
-import Login from './pages/Login'
-import { Toaster } from '@/components/ui/sonner'
-import TitleBar from './layout/TitleBar'
-import Configuracion from './pages/Configuracion'
-import Perfil from './pages/Perfil' // <--- Importamos Perfil
-import { FLAGS } from './config/flags' // <--- Importamos Flags
+import { Toaster } from '@ui/sonner'
+import { FLAGS } from '@config/flags'
+
+// IMPORTS DEL CORE
+import TitleBar from '@core/layout/TitleBar'
+import AppLayout from '@core/layout/AppLayout'
+import Configuracion from '@core/pages/Configuracion'
+
+// IMPORTS DEL MÓDULO AUTH
+import { AuthProvider, useAuth } from '@auth/context/AuthContext'
+import Login from '@auth/pages/Login'
+import Perfil from '@auth/pages/Perfil'
 
 const RootRoutes = () => {
   const { user } = useAuth()
@@ -29,7 +33,7 @@ const RootRoutes = () => {
               />
               <Route path="/configuracion" element={<Configuracion />} />
 
-              {/* RUTA CONDICIONAL DE PERFIL */}
+              {/* RUTA CONDICIONAL DEL MÓDULO AUTH */}
               {FLAGS.ENABLE_AUTH && <Route path="/perfil" element={<Perfil />} />}
 
               <Route

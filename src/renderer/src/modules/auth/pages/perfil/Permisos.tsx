@@ -1,16 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table'
+import { Input } from '@ui/input'
+import { Checkbox } from '@ui/checkbox'
+import { Button } from '@ui/button'
 import { toast } from 'sonner'
 import { Shield, Save, RefreshCw, LayoutDashboard, Settings, User, FileText } from 'lucide-react'
 
@@ -223,9 +216,9 @@ export function Permisos() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50 border-b border-border">
-                <TableHead className="w-[350px] pl-4">Funcionalidad</TableHead>
+                <TableHead className="w-87.5 pl-4">Funcionalidad</TableHead>
                 {roles.map((role) => (
-                  <TableHead key={role.id} className="text-center min-w-[120px] py-3">
+                  <TableHead key={role.id} className="text-center min-w-30 py-3">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
                         Nivel {role.id}

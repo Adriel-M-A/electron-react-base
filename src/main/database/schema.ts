@@ -1,5 +1,5 @@
 import { db } from './client'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { FLAGS } from '../config'
 
 export async function initDB(): Promise<void> {

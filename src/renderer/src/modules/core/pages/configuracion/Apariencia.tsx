@@ -1,6 +1,6 @@
 import { useTheme } from 'next-themes'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@ui/card'
+import { Button } from '@ui/button'
 import { Sun, Moon, Monitor } from 'lucide-react'
 
 export default function Apariencia() {
