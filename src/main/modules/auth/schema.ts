@@ -1,5 +1,5 @@
 import { Database } from 'better-sqlite3'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 
 export function initAuthSchema(db: Database): void {
   // 1. Tabla Usuarios
