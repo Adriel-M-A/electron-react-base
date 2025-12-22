@@ -3,9 +3,10 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-// IMPORTS MODULARES
+// IMPORTS
 import { getDB } from './core/database'
 import { registerWindowHandlers } from './core/window.ipc'
+import { runMigrations } from './core/migrations'
 import { AuthModule } from './modules/auth'
 
 function createWindow(): void {
@@ -32,19 +33,21 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // 1. Inicializar Core (Handlers de Ventana)
+  // --- INICIALIZACIÓN DEL BACKEND ---
+
+  // 1. Core: Handlers de ventana
   registerWindowHandlers(mainWindow)
 
-  // 2. Inicializar Módulos (Schemas y Handlers)
+  // 2. Core: Base de Datos y Migraciones
   const db = getDB()
 
-  // -- Auth Module --
-  AuthModule.init(db)
+  console.log('Verificando migraciones de base de datos...')
+  runMigrations(db) // <--- ESTO CREA/ACTUALIZA LAS TABLAS
+
+  // 3. Módulos: Registrar Handlers IPC
   AuthModule.register()
 
-  // -- Futuro Módulo Ventas --
-  // VentasModule.init(db)
-  // VentasModule.register()
+  // ----------------------------------
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
