@@ -1,17 +1,22 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/tabs'
 import { Palette, Database, Lock } from 'lucide-react'
-import Apariencia from './configuracion/Apariencia'
 import { useAuth } from '@auth/context/AuthContext'
+
+// Importamos los sub-componentes
+import Apariencia from './configuracion/Apariencia'
+import Backups from './configuracion/Backups'
 
 export default function Configuracion() {
   const { hasPermission } = useAuth()
 
-  // Calculamos qué pestaña mostrar por defecto
+  // Calculamos qué pestaña mostrar por defecto según permisos
   const canSeeApariencia = hasPermission('config_apariencia')
   const canSeeSistema = hasPermission('config_sistema')
 
+  // Lógica para seleccionar la primera pestaña disponible automáticamente
   const defaultTab = canSeeApariencia ? 'apariencia' : canSeeSistema ? 'sistema' : ''
 
+  // Si no tiene permisos para nada, mostramos bloqueo
   if (!defaultTab) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
@@ -27,7 +32,7 @@ export default function Configuracion() {
       <div className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Configuración</h1>
         <p className="text-muted-foreground text-sm">
-          Ajustes generales del sistema y preferencias visuales.
+          Ajustes generales del sistema, copias de seguridad y preferencias.
         </p>
       </div>
 
@@ -41,7 +46,7 @@ export default function Configuracion() {
 
           {canSeeSistema && (
             <TabsTrigger value="sistema" className="tabs-trigger-style">
-              <Database className="h-4 w-4 mr-2" /> Sistema
+              <Database className="h-4 w-4 mr-2" /> Sistema y Backups
             </TabsTrigger>
           )}
         </TabsList>
@@ -55,9 +60,7 @@ export default function Configuracion() {
 
           {canSeeSistema && (
             <TabsContent value="sistema" className="m-0 outline-none">
-              <div className="p-4 border rounded-lg border-dashed border-muted-foreground/20 text-center text-muted-foreground">
-                Opciones de base de datos y logs del sistema próximamente.
-              </div>
+              <Backups />
             </TabsContent>
           )}
         </div>

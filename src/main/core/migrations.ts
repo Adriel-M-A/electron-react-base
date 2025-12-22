@@ -1,5 +1,5 @@
 import { Database } from 'better-sqlite3'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 
 // Definimos la estructura de una migración
 interface Migration {

@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 // IMPORTS
 import { getDB } from './core/database'
 import { registerWindowHandlers } from './core/window.ipc'
+import { registerBackupHandlers } from './core/backup.ipc'
 import { runMigrations } from './core/migrations'
 import { AuthModule } from './modules/auth'
 
@@ -37,6 +38,7 @@ function createWindow(): void {
 
   // 1. Core: Handlers de ventana
   registerWindowHandlers(mainWindow)
+  registerBackupHandlers()
 
   // 2. Core: Base de Datos y Migraciones
   const db = getDB()

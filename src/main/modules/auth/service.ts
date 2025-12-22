@@ -1,5 +1,5 @@
 import { db } from '../../core/database'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 
 export const AuthService = {
   // --- USUARIOS ---
