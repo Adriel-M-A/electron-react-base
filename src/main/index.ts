@@ -1,21 +1,20 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initDB } from './database/schema'
-import { registerWindowHandlers } from './handlers/window.ipc'
-import { registerAuthHandlers } from './handlers/auth.ipc'
-import { registerRoleHandlers } from './handlers/roles.ipc' // <--- IMPORTANTE
-import { FLAGS } from './config'
+
+// IMPORTS MODULARES
+import { getDB } from './core/database'
+import { registerWindowHandlers } from './core/window.ipc'
+import { AuthModule } from './modules/auth'
 
 function createWindow(): void {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    frame: false, // Quitamos el marco nativo
+    frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -33,20 +32,20 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // 1. Inicializar Base de Datos
-  initDB()
-
-  // 2. Registrar Handlers Generales
+  // 1. Inicializar Core (Handlers de Ventana)
   registerWindowHandlers(mainWindow)
 
-  // 3. Registrar Handlers de Auth y Roles (Si están activos)
-  if (FLAGS.ENABLE_AUTH) {
-    registerAuthHandlers()
-    registerRoleHandlers() // <--- REGISTRAR AQUÍ
-  }
+  // 2. Inicializar Módulos (Schemas y Handlers)
+  const db = getDB()
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
+  // -- Auth Module --
+  AuthModule.init(db)
+  AuthModule.register()
+
+  // -- Futuro Módulo Ventas --
+  // VentasModule.init(db)
+  // VentasModule.register()
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -54,30 +53,20 @@ function createWindow(): void {
   }
 }
 
-// This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
-  // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
   createWindow()
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-// Quit when all windows are closed, except on macOS.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
