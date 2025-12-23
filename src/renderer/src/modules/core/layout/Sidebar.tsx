@@ -1,11 +1,12 @@
 import { cn } from '@/lib/utils'
 import { useAuth } from '@auth/context/AuthContext'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Settings, LogOut, ChevronRight, ChevronsRight } from 'lucide-react'
+import { LogOut, ChevronRight, ChevronsRight } from 'lucide-react'
 import { Button } from '@ui/button'
 import { Separator } from '@ui/separator'
 import { Avatar, AvatarFallback, AvatarImage } from '@ui/avatar'
 import { FLAGS } from '@config/flags'
+import { APP_NAVIGATION, PERMISSIONS } from '@config/navigation'
 
 interface SidebarProps {
   className?: string
@@ -17,17 +18,11 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
   const { user, logout, hasPermission } = useAuth()
   const navigate = useNavigate()
 
-  // Definimos los items con su ID de permiso requerido
-  const allNavItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard, permission: 'dashboard' },
-    { name: 'Configuración', path: '/configuracion', icon: Settings, permission: 'configuracion' }
-  ]
+  const visibleNavItems = APP_NAVIGATION.filter(
+    (item) => !item.hiddenInSidebar && hasPermission(item.id)
+  )
 
-  // Filtramos: Solo mostramos si tiene permiso
-  const visibleNavItems = allNavItems.filter((item) => hasPermission(item.permission))
-
-  // Solo permitimos click en el perfil si tiene permiso a la sección 'perfil'
-  const canAccessProfile = hasPermission('perfil')
+  const canAccessProfile = hasPermission(PERMISSIONS.PERFIL.ROOT)
 
   const handleProfileClick = () => {
     if (canAccessProfile) {
@@ -63,7 +58,7 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
         {visibleNavItems.map((item) => (
           <NavLink
             key={item.path}
-            to={item.path}
+            to={item.path!}
             onClick={onMobileClick}
             className={({ isActive }) =>
               cn(
@@ -84,7 +79,7 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
                 />
                 {!collapsed && (
                   <>
-                    <span className="flex-1 truncate">{item.name}</span>
+                    <span className="flex-1 truncate">{item.label}</span>
                     {isActive && <ChevronRight className="h-3 w-3 opacity-50" />}
                   </>
                 )}
@@ -97,7 +92,6 @@ export function Sidebar({ className, collapsed, onMobileClick }: SidebarProps) {
 
       {FLAGS.ENABLE_AUTH && (
         <div className="p-3 mt-auto space-y-2">
-          {/* Tarjeta de Usuario: Condicionalmente Clickable */}
           <div
             onClick={handleProfileClick}
             className={cn(

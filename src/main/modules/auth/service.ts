@@ -1,14 +1,42 @@
 import { db } from '../../core/database'
 import bcrypt from 'bcrypt'
+import { PERMISSIONS } from '../../../shared/permissions'
 
-// FUNCIÓN DE AYUDA (Helper)
-// Convierte "juAN" -> "Juan"
+// Estado de sesión simple en memoria (Main Process)
+let currentSession: { id: number; level: number } | null = null
+
 const formatName = (text: string): string => {
   if (!text) return text
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 }
 
 export const AuthService = {
+  // --- VERIFICACIÓN DE SEGURIDAD ---
+  getCurrentUser: () => currentSession,
+
+  logout: () => {
+    currentSession = null
+    return { success: true }
+  },
+
+  // Verifica si el usuario logueado tiene el permiso requerido
+  checkPermission: (requiredPerm: string): boolean => {
+    if (!currentSession) return false
+    if (currentSession.level === 1) return true // Admin siempre pasa
+
+    try {
+      const role = db
+        .prepare('SELECT permissions FROM roles WHERE id = ?')
+        .get(currentSession.level) as any
+      if (!role) return false
+
+      const perms = JSON.parse(role.permissions)
+      return perms.includes(requiredPerm)
+    } catch (e) {
+      return false
+    }
+  },
+
   // --- USUARIOS ---
   login: (usuario: string, password: string) => {
     const user = db.prepare('SELECT * FROM usuarios WHERE usuario = ?').get(usuario) as any
@@ -17,7 +45,9 @@ export const AuthService = {
     const match = bcrypt.compareSync(password, user.password)
     if (!match) return { success: false, message: 'Contraseña incorrecta' }
 
-    // Actualizar last_login
+    // GUARDAMOS LA SESIÓN EN BACKEND
+    currentSession = { id: user.id, level: user.level }
+
     db.prepare('UPDATE usuarios SET last_login = CURRENT_TIMESTAMP WHERE id = ?').run(user.id)
 
     const { password: _, ...userData } = user
@@ -31,9 +61,12 @@ export const AuthService = {
   },
 
   createUser: (data: any) => {
-    const { nombre, apellido, usuario, password, level } = data
+    // PROTECCIÓN: Solo si tiene permiso de gestionar usuarios
+    if (!AuthService.checkPermission(PERMISSIONS.PERFIL.USUARIOS)) {
+      return { success: false, message: 'No tienes permiso para crear usuarios' }
+    }
 
-    // APLICAMOS EL FORMATO AQUÍ
+    const { nombre, apellido, usuario, password, level } = data
     const nombreFmt = formatName(nombre)
     const apellidoFmt = formatName(apellido)
 
@@ -41,14 +74,9 @@ export const AuthService = {
       const hashedPassword = bcrypt.hashSync(password, 10)
       const info = db
         .prepare(
-          `
-        INSERT INTO usuarios (nombre, apellido, usuario, password, level)
-        VALUES (?, ?, ?, ?, ?)
-      `
+          `INSERT INTO usuarios (nombre, apellido, usuario, password, level) VALUES (?, ?, ?, ?, ?)`
         )
-        // Usamos las variables formateadas (nombreFmt, apellidoFmt)
         .run(nombreFmt, apellidoFmt, usuario, hashedPassword, level)
-
       return { success: true, id: info.lastInsertRowid }
     } catch (error: any) {
       if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
@@ -59,17 +87,23 @@ export const AuthService = {
   },
 
   updateUser: (id: number, data: any) => {
+    // PROTECCIÓN: Permitir si es admin O si se edita a sí mismo
+    const isSelf = currentSession?.id === id
+    const hasPerm = AuthService.checkPermission(PERMISSIONS.PERFIL.USUARIOS)
+
+    if (!isSelf && !hasPerm) {
+      return { success: false, message: 'No autorizado' }
+    }
+
     const updates: string[] = []
     const params: any[] = []
 
     if (data.nombre) {
       updates.push('nombre = ?')
-      // Aplicamos formato también al editar
       params.push(formatName(data.nombre))
     }
     if (data.apellido) {
       updates.push('apellido = ?')
-      // Aplicamos formato también al editar
       params.push(formatName(data.apellido))
     }
     if (data.usuario) {
@@ -77,6 +111,10 @@ export const AuthService = {
       params.push(data.usuario)
     }
     if (data.level) {
+      // PROTECCIÓN EXTRA: Solo Admin puede cambiar roles
+      if (!AuthService.checkPermission(PERMISSIONS.PERFIL.USUARIOS)) {
+        return { success: false, message: 'No puedes cambiar el nivel de acceso' }
+      }
       updates.push('level = ?')
       params.push(data.level)
     }
@@ -89,6 +127,13 @@ export const AuthService = {
       const updatedUser = db
         .prepare('SELECT id, nombre, apellido, usuario, level FROM usuarios WHERE id = ?')
         .get(id)
+
+      // Actualizamos sesión si nos editamos a nosotros mismos
+      if (isSelf && updatedUser) {
+        // @ts-ignore
+        currentSession.level = updatedUser.level
+      }
+
       return { success: true, user: updatedUser }
     } catch (error) {
       return { success: false, message: 'Error al actualizar' }
@@ -96,6 +141,14 @@ export const AuthService = {
   },
 
   deleteUser: (id: number) => {
+    if (!AuthService.checkPermission(PERMISSIONS.PERFIL.USUARIOS)) {
+      return { success: false, message: 'No autorizado' }
+    }
+
+    if (currentSession?.id === id) {
+      return { success: false, message: 'No puedes eliminarte a ti mismo' }
+    }
+
     try {
       db.prepare('DELETE FROM usuarios WHERE id = ?').run(id)
       return { success: true }
@@ -105,6 +158,11 @@ export const AuthService = {
   },
 
   changePassword: (id: number, currentPass: string, newPass: string) => {
+    // Solo permitirse cambiarse a uno mismo
+    if (currentSession?.id !== id) {
+      return { success: false, message: 'No autorizado' }
+    }
+
     const user = db.prepare('SELECT password FROM usuarios WHERE id = ?').get(id) as any
     if (!user) return { success: false, message: 'Usuario no encontrado' }
 
@@ -124,6 +182,11 @@ export const AuthService = {
   },
 
   updateRole: (id: number, label: string, permissions: string[]) => {
+    // Solo ADMIN (Nivel 1) puede tocar roles.
+    if (!currentSession || currentSession.level !== 1) {
+      return { success: false, message: 'Solo el administrador puede editar roles' }
+    }
+
     const permsString = JSON.stringify(permissions)
     db.prepare('UPDATE roles SET label = ?, permissions = ? WHERE id = ?').run(
       label,

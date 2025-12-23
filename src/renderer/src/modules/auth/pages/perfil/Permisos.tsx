@@ -5,40 +5,8 @@ import { Input } from '@ui/input'
 import { Checkbox } from '@ui/checkbox'
 import { Button } from '@ui/button'
 import { toast } from 'sonner'
-import { Shield, Save, RefreshCw, LayoutDashboard, Settings, User, FileText } from 'lucide-react'
-
-// --- ESTRUCTURA JERÁRQUICA DE LA APP ---
-const APP_STRUCTURE = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard / Inicio',
-    type: 'section',
-    icon: LayoutDashboard,
-    children: []
-  },
-  {
-    id: 'perfil',
-    label: 'Perfil y Acceso',
-    type: 'section',
-    icon: User,
-    children: [
-      { id: 'perfil_cuenta', label: 'Pestaña: Mi Cuenta' },
-      { id: 'perfil_seguridad', label: 'Pestaña: Seguridad' },
-      { id: 'perfil_usuarios', label: 'Pestaña: Gestión de Usuarios' },
-      { id: 'perfil_permisos', label: 'Pestaña: Permisos' }
-    ]
-  },
-  {
-    id: 'configuracion',
-    label: 'Configuración',
-    type: 'section',
-    icon: Settings,
-    children: [
-      { id: 'config_apariencia', label: 'Pestaña: Apariencia' },
-      { id: 'config_sistema', label: 'Pestaña: Sistema' }
-    ]
-  }
-]
+import { Shield, Save, RefreshCw, FileText } from 'lucide-react'
+import { APP_NAVIGATION } from '@config/navigation'
 
 interface Role {
   id: number
@@ -68,9 +36,8 @@ export function Permisos() {
     setRoles((prev) => prev.map((r) => (r.id === roleId ? { ...r, label: newName } : r)))
   }
 
-  // --- LÓGICA DE PERMISOS CONSISTENTE ---
   const handlePermissionToggle = (roleId: number, permissionId: string) => {
-    if (roleId === 1) return // Admin bloqueado
+    if (roleId === 1) return
 
     setRoles((prev) =>
       prev.map((r) => {
@@ -79,9 +46,8 @@ export function Permisos() {
         const hasPerm = r.permissions.includes(permissionId)
         let newPerms = [...r.permissions]
 
-        // Identificar qué estamos tocando
-        const section = APP_STRUCTURE.find((s) => s.id === permissionId)
-        const parentSection = APP_STRUCTURE.find((s) =>
+        const section = APP_NAVIGATION.find((s) => s.id === permissionId)
+        const parentSection = APP_NAVIGATION.find((s) =>
           s.children?.some((c) => c.id === permissionId)
         )
 
@@ -89,31 +55,25 @@ export function Permisos() {
         const isTab = !!parentSection
 
         if (hasPerm) {
-          // --- CASO: DESACTIVAR (Uncheck) ---
           newPerms = newPerms.filter((p) => p !== permissionId)
 
-          if (isSection && section.children) {
-            // Si quito la Sección -> Quito TODOS sus hijos
+          if (isSection && section?.children) {
             const childrenIds = section.children.map((c) => c.id)
             newPerms = newPerms.filter((p) => !childrenIds.includes(p))
           }
 
           if (isTab && parentSection) {
-            // Si quito una Pestaña -> Verifico si quedan otras pestañas hermanas activas
             const siblings = parentSection.children?.map((c) => c.id) || []
             const anySiblingActive = siblings.some((s) => newPerms.includes(s))
 
-            // Si NO quedan pestañas activas, quito también la Sección (para no dejarla vacía)
             if (!anySiblingActive) {
               newPerms = newPerms.filter((p) => p !== parentSection.id)
             }
           }
         } else {
-          // --- CASO: ACTIVAR (Check) ---
           newPerms.push(permissionId)
 
-          if (isSection && section.children) {
-            // Si activo la Sección -> Activo TODOS sus hijos (para no dejarla vacía)
+          if (isSection && section?.children) {
             section.children.forEach((child) => {
               if (!newPerms.includes(child.id)) {
                 newPerms.push(child.id)
@@ -122,7 +82,6 @@ export function Permisos() {
           }
 
           if (isTab && parentSection) {
-            // Si activo una Pestaña -> Activo obligatoriamente la Sección padre
             if (!newPerms.includes(parentSection.id)) {
               newPerms.push(parentSection.id)
             }
@@ -136,13 +95,15 @@ export function Permisos() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      for (const role of roles) {
-        await window.api.roles.update({
+      const promises = roles.map((role) =>
+        window.api.roles.update({
           id: role.id,
           label: role.label,
           permissions: role.permissions
         })
-      }
+      )
+
+      await Promise.all(promises)
       toast.success('Matriz de permisos actualizada')
     } catch (error) {
       toast.error('Error al guardar configuración')
@@ -236,7 +197,7 @@ export function Permisos() {
             </TableHeader>
 
             <TableBody>
-              {APP_STRUCTURE.map((section) => (
+              {APP_NAVIGATION.map((section) => (
                 <>
                   {renderPermissionRow(section)}
                   {section.children &&
