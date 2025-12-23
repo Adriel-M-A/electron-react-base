@@ -43,36 +43,37 @@
 
 @layer base {
   .dark {
-    --color-background: hsl(222 47% 7%);
-    --color-foreground: hsl(213 31% 91%);
+    /* Minimal, neutral dark theme - no blue accents */
+    --color-background: hsl(0 0% 9%); /* very dark gray */
+    --color-foreground: hsl(0 0% 95%); /* off-white for readable text */
 
-    --color-card: hsl(222 47% 10%);
-    --color-card-foreground: hsl(213 31% 91%);
+    --color-card: hsl(0 0% 12%);
+    --color-card-foreground: hsl(0 0% 95%);
 
-    --color-primary: hsl(217 91% 60%);
-    --color-primary-foreground: hsl(210 20% 98%);
+    --color-primary: hsl(35 20% 92%); /* acento casi blanco, cálido y claro */
+    --color-primary-foreground: hsl(0 0% 12%); /* texto oscuro para legibilidad */
 
-    --color-secondary: hsl(217 32% 17%);
-    --color-secondary-foreground: hsl(210 20% 98%);
+    --color-secondary: hsl(0 0% 14%);
+    --color-secondary-foreground: hsl(0 0% 70%);
 
-    --color-muted: hsl(217 32% 17%);
-    --color-muted-foreground: hsl(215 20% 65%);
+    --color-muted: hsl(0 0% 14%);
+    --color-muted-foreground: hsl(0 0% 60%);
 
-    /* AGREGADO: Colores Destructive Dark */
-    --color-destructive: hsl(0 62.8% 30.6%);
-    --color-destructive-foreground: hsl(210 40% 98%);
+    /* Colores Destructive Dark (rojo) */
+    --color-destructive: hsl(0 55% 48%); /* Opción A: menos chillón y más legible */
+    --color-destructive-foreground: hsl(0 0% 98%);
 
-    --color-border: hsl(217 32% 17%);
-    --color-input: hsl(217 32% 17%);
+    --color-border: hsl(0 0% 13%);
+    --color-input: hsl(0 0% 13%);
 
-    --color-sidebar: hsl(222 47% 8%);
-    --color-sidebar-foreground: hsl(215 20% 65%);
-    --color-sidebar-border: hsl(217 32% 15%);
+    --color-sidebar: hsl(0 0% 10%);
+    --color-sidebar-foreground: hsl(0 0% 60%);
+    --color-sidebar-border: hsl(0 0% 14%);
 
-    /* Scrollbar theme variables - dark */
-    --color-scrollbar-track: hsl(217 32% 17%);
-    --color-scrollbar-thumb: hsl(217 32% 40%);
-    --color-scrollbar-thumb-hover: hsl(217 32% 50%);
+    /* Scrollbar theme variables - dark (neutral) */
+    --color-scrollbar-track: hsl(0 0% 12%);
+    --color-scrollbar-thumb: hsl(0 0% 28%);
+    --color-scrollbar-thumb-hover: hsl(0 0% 36%);
   }
 
   * {

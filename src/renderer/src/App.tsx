@@ -72,7 +72,7 @@ function App(): React.ReactElement {
         <HashRouter>
           <RootRoutes />
         </HashRouter>
-        <Toaster richColors position="bottom-center" />
+        <Toaster position="bottom-center" />
       </AuthProvider>
     </UIProvider>
   )
