@@ -71,7 +71,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return
     }
 
-    const savedUser = localStorage.getItem('user_session')
+    // Usamos sessionStorage para que la sesión no persista cuando la app se cierra
+    const savedUser = sessionStorage.getItem('user_session')
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser)
       setUser(parsedUser)
@@ -87,7 +88,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (response.success && response.user) {
       setUser(response.user)
       loadUserPermissions(response.user.level) // <--- Cargar permisos al login
-      localStorage.setItem('user_session', JSON.stringify(response.user))
+      // Guardamos en sessionStorage para que se borre al cerrar la app
+      sessionStorage.setItem('user_session', JSON.stringify(response.user))
       window.api.window.setAppSize()
       return { success: true }
     }
@@ -100,7 +102,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (response.success && response.user) {
       const newUser = { ...user, ...response.user }
       setUser(newUser)
-      localStorage.setItem('user_session', JSON.stringify(newUser))
+      // Actualizamos la sesión en sessionStorage
+      sessionStorage.setItem('user_session', JSON.stringify(newUser))
 
       // Si el nivel cambió, recargamos permisos
       if (response.user.level !== user.level) {
@@ -120,7 +123,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!FLAGS.ENABLE_AUTH) return
     setUser(null)
     setPermissions([])
-    localStorage.removeItem('user_session')
+    // Borramos la sesión en sessionStorage
+    sessionStorage.removeItem('user_session')
     window.api.window.setLoginSize()
   }
 
