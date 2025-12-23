@@ -3,10 +3,9 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-// IMPORTS
 import { getDB } from './core/database'
 import { registerWindowHandlers } from './core/window.ipc'
-import { registerBackupHandlers } from './core/backup.ipc'
+import { registerBackupHandlers, runAutoBackup } from './core/backup.ipc'
 import { runMigrations } from './core/migrations'
 import { AuthModule } from './modules/auth'
 
@@ -34,22 +33,15 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  // --- INICIALIZACIÓN DEL BACKEND ---
-
-  // 1. Core: Handlers de ventana
   registerWindowHandlers(mainWindow)
   registerBackupHandlers()
 
-  // 2. Core: Base de Datos y Migraciones
   const db = getDB()
 
   console.log('Verificando migraciones de base de datos...')
-  runMigrations(db) // <--- ESTO CREA/ACTUALIZA LAS TABLAS
+  runMigrations(db)
 
-  // 3. Módulos: Registrar Handlers IPC
   AuthModule.register()
-
-  // ----------------------------------
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -72,8 +64,9 @@ app.whenReady().then(() => {
   })
 })
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
   if (process.platform !== 'darwin') {
+    await runAutoBackup()
     app.quit()
   }
 })
