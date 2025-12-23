@@ -12,11 +12,11 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: ${productName}
+  executableName: AppNamePlaceholder
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
+  shortcutName: AppNamePlaceholder
+  uninstallDisplayName: AppNamePlaceholder
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
