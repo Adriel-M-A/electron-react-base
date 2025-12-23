@@ -50,14 +50,14 @@ const migrationsList: Migration[] = [
           adminPerms
         )
 
-        const staffPerms = JSON.stringify(['ver_dashboard', 'realizar_ventas'])
+        const staffPerms = JSON.stringify(['dashboard', 'perfil', 'perfil_cuenta'])
         db.prepare('INSERT INTO roles (id, label, permissions) VALUES (?, ?, ?)').run(
           2,
           'Staff',
           staffPerms
         )
 
-        const auditorPerms = JSON.stringify(['ver_dashboard', 'ver_reportes'])
+        const auditorPerms = JSON.stringify(['dashboard'])
         db.prepare('INSERT INTO roles (id, label, permissions) VALUES (?, ?, ?)').run(
           3,
           'Auditor',
