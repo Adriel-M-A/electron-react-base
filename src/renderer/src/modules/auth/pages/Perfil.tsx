@@ -1,9 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/tabs'
 import { User, Users, KeyRound } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Cuenta } from './perfil/Cuenta'
 import { Usuarios } from './perfil/Usuarios'
 import { Permisos } from './perfil/Permisos'
+import TabsSection, { TabDef } from '@ui/TabsSection'
 
 export default function Perfil() {
   const { hasPermission } = useAuth()
@@ -27,56 +27,49 @@ export default function Perfil() {
     )
   }
 
+  const tabs: TabDef[] = []
+  if (pCuenta)
+    tabs.push({
+      value: 'cuenta',
+      label: (
+        <>
+          <User className="h-4 w-4 mr-2" />
+          Mi Cuenta
+        </>
+      ),
+      content: <Cuenta />
+    })
+  if (pUsuarios)
+    tabs.push({
+      value: 'usuarios',
+      label: (
+        <>
+          <Users className="h-4 w-4 mr-2" />
+          Gestión de Usuarios
+        </>
+      ),
+      content: <Usuarios />
+    })
+  if (pPermisos)
+    tabs.push({
+      value: 'permisos',
+      label: (
+        <>
+          <KeyRound className="h-4 w-4 mr-2" />
+          Permisos
+        </>
+      ),
+      content: <Permisos />
+    })
+
+  const defaultTabComputed = tabs.length ? tabs[0].value : ''
+
   return (
-    <div className="p-8 h-full flex flex-col space-y-6 overflow-hidden bg-background animate-in fade-in duration-500">
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Perfil y Acceso</h1>
-        <p className="text-muted-foreground text-sm">
-          Gestiona tu información personal, seguridad y usuarios del sistema.
-        </p>
-      </div>
-
-      <Tabs defaultValue={defaultTab} className="flex-1 flex flex-col overflow-hidden">
-        <TabsList className="justify-start bg-transparent border-b rounded-none h-auto p-0 space-x-6 w-full">
-          {pCuenta && (
-            <TabsTrigger value="cuenta" className="tabs-trigger-style">
-              <User className="h-4 w-4 mr-2" /> Mi Cuenta
-            </TabsTrigger>
-          )}
-
-          {pUsuarios && (
-            <TabsTrigger value="usuarios" className="tabs-trigger-style">
-              <Users className="h-4 w-4 mr-2" /> Gestión de Usuarios
-            </TabsTrigger>
-          )}
-
-          {pPermisos && (
-            <TabsTrigger value="permisos" className="tabs-trigger-style">
-              <KeyRound className="h-4 w-4 mr-2" /> Permisos
-            </TabsTrigger>
-          )}
-        </TabsList>
-
-        <div className="flex-1 overflow-y-auto pt-6 custom-scrollbar">
-          {pCuenta && (
-            <TabsContent value="cuenta" className="m-0 outline-none">
-              <Cuenta />
-            </TabsContent>
-          )}
-
-          {pUsuarios && (
-            <TabsContent value="usuarios" className="m-0 outline-none">
-              <Usuarios />
-            </TabsContent>
-          )}
-
-          {pPermisos && (
-            <TabsContent value="permisos" className="m-0 outline-none">
-              <Permisos />
-            </TabsContent>
-          )}
-        </div>
-      </Tabs>
-    </div>
+    <TabsSection
+      title="Perfil y Acceso"
+      subtitle="Gestiona tu información personal, seguridad y usuarios del sistema."
+      tabs={tabs}
+      defaultValue={defaultTabComputed}
+    />
   )
 }

@@ -157,7 +157,7 @@ export function Permisos() {
     return <div className="p-10 text-center text-muted-foreground">Cargando matriz...</div>
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 pb-10">
+    <div className="space-y-6 pb-10">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold flex items-center gap-2">

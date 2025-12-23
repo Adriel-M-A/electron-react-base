@@ -189,13 +189,13 @@ export function Cuenta() {
                 >
                   Nombre
                 </Label>
-                <Input
-                  id="nombre"
-                  value={isEditing ? formData.nombre : user?.nombre}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                  className={!isEditing ? 'bg-muted/30' : 'bg-background'}
-                />
+                {isEditing ? (
+                  <Input id="nombre" value={formData.nombre} onChange={handleInputChange} />
+                ) : (
+                  <div className="px-3 py-2 rounded bg-muted/30 text-foreground h-10 flex items-center cursor-default">
+                    {user?.nombre}
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label
@@ -204,13 +204,13 @@ export function Cuenta() {
                 >
                   Apellido
                 </Label>
-                <Input
-                  id="apellido"
-                  value={isEditing ? formData.apellido : user?.apellido}
-                  onChange={handleInputChange}
-                  readOnly={!isEditing}
-                  className={!isEditing ? 'bg-muted/30 border-transparent' : 'bg-background'}
-                />
+                {isEditing ? (
+                  <Input id="apellido" value={formData.apellido} onChange={handleInputChange} />
+                ) : (
+                  <div className="px-3 py-2 rounded bg-muted/30 text-foreground h-10 flex items-center cursor-default">
+                    {user?.apellido}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -221,17 +221,13 @@ export function Cuenta() {
               >
                 Usuario (Login)
               </Label>
-              <Input
-                id="usuario"
-                value={isEditing ? formData.usuario : user?.usuario}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-                className={
-                  !isEditing
-                    ? 'bg-muted/30 border-transparent font-mono'
-                    : 'bg-background font-mono'
-                }
-              />
+              {isEditing ? (
+                <Input id="usuario" value={formData.usuario} onChange={handleInputChange} />
+              ) : (
+                <div className="px-3 py-2 rounded bg-muted/30 text-foreground h-10 flex items-center cursor-default font-mono">
+                  @{user?.usuario}
+                </div>
+              )}
             </div>
           </CardContent>
 
