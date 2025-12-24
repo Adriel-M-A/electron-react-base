@@ -1,5 +1,5 @@
 import { db } from '../../core/database'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { PERMISSIONS } from '../../../shared/permissions'
 
 // Estado de sesión simple en memoria (Main Process)
