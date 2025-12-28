@@ -45,18 +45,13 @@ const RootRoutes = () => {
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         ) : (
+          // 2. ENVOLVEMOS LAS RUTAS AUTENTICADAS
           <Routes>
             <Route element={<AppLayout />}>
-              <Route
-                path="/"
-                element={<div className="p-10 text-2xl font-bold">Panel de Inicio</div>}
-              />
+              <Route path="/" element={<div className="text-red-500">Página principal</div>} />
               <Route path="/configuracion" element={<Configuracion />} />
               {FLAGS.ENABLE_AUTH && <Route path="/perfil" element={<Perfil />} />}
-              <Route
-                path="*"
-                element={<div className="p-10 text-red-500">Página no encontrada</div>}
-              />
+              <Route path="*" element={<div className="text-red-500">Página no encontrada</div>} />
             </Route>
           </Routes>
         )}
