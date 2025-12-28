@@ -1,7 +1,8 @@
-import { Database } from 'better-sqlite3'
+import { db } from '../core/database'
 import bcrypt from 'bcryptjs'
 
-export function initAuthSchema(db: Database): void {
+export function initAuthSchema() {
+  // 1. Tabla Usuarios
   db.exec(`
     CREATE TABLE IF NOT EXISTS usuarios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,10 +12,11 @@ export function initAuthSchema(db: Database): void {
       password TEXT NOT NULL,
       level INTEGER NOT NULL CHECK (level IN (1, 2, 3)),
       last_login DATETIME,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT (datetime('now', 'localtime'))
     )
   `)
 
+  // 2. Tabla Roles
   db.exec(`
     CREATE TABLE IF NOT EXISTS roles (
       id INTEGER PRIMARY KEY,
@@ -23,38 +25,28 @@ export function initAuthSchema(db: Database): void {
     )
   `)
 
+  // 3. Seed Roles
   const rolesCount = db.prepare('SELECT count(*) as count FROM roles').get() as any
   if (rolesCount.count === 0) {
     const adminPerms = JSON.stringify(['*'])
-    db.prepare('INSERT INTO roles (id, label, permissions) VALUES (?, ?, ?)').run(
-      1,
-      'Administrador',
-      adminPerms
-    )
+    const staffPerms = JSON.stringify(['shift', 'services', 'perfil', 'perfil_cuenta'])
+    const auditorPerms = JSON.stringify(['dashboard'])
 
-    const staffPerms = JSON.stringify(['dashboard', 'perfil', 'perfil_cuenta'])
-    db.prepare('INSERT INTO roles (id, label, permissions) VALUES (?, ?, ?)').run(
-      2,
-      'Staff',
-      staffPerms
-    )
-
-    const auditorPerms = JSON.stringify(['dashboard', 'configuracion', 'config_apariencia'])
-    db.prepare('INSERT INTO roles (id, label, permissions) VALUES (?, ?, ?)').run(
-      3,
-      'Auditor',
-      auditorPerms
-    )
+    const stmt = db.prepare('INSERT INTO roles (id, label, permissions) VALUES (?, ?, ?)')
+    stmt.run(1, 'Administrador', adminPerms)
+    stmt.run(2, 'Staff', staffPerms)
+    stmt.run(3, 'Auditor', auditorPerms)
   }
 
+  // 4. Seed Usuario Admin
   const userCount = db.prepare('SELECT count(*) as count FROM usuarios').get() as any
   if (userCount.count === 0) {
-    const pass = bcrypt.hashSync('admin123', 10)
+    const pass = bcrypt.hashSync('admin', 10)
     db.prepare(
       `
       INSERT INTO usuarios (nombre, apellido, usuario, password, level) 
       VALUES (?, ?, ?, ?, ?)
     `
-    ).run('Admin', 'Principal', 'administrador', pass, 1)
+    ).run('Admin', 'Principal', 'admin', pass, 1)
   }
 }

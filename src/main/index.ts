@@ -3,16 +3,18 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-import { getDB } from './core/database'
-import { registerWindowHandlers } from './core/window.ipc'
-import { registerBackupHandlers, runAutoBackup } from './core/backup.ipc'
-import { runMigrations } from './core/migrations'
+import { getDB } from './modules/core/database'
+import { runMigrations } from './modules/core/migrations'
+import { setupBackupSystem } from './modules/core/backup.ipc'
+import { setupWindowIPC } from './modules/core/window.ipc'
+
+// Importar Módulos
 import { AuthModule } from './modules/auth'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1200,
+    height: 800,
     show: false,
     autoHideMenuBar: true,
     frame: false,
@@ -33,18 +35,22 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  registerWindowHandlers(mainWindow)
-  registerBackupHandlers()
-
+  // --- INICIALIZACIÓN ---
   const db = getDB()
-
-  console.log('Verificando migraciones de base de datos...')
   runMigrations(db)
 
-  AuthModule.register()
+  console.log('Iniciando módulos...')
+  AuthModule.init()
+
+  // --- SISTEMAS CORE ---
+  setupBackupSystem(mainWindow)
+  setupWindowIPC(mainWindow)
+
+  console.log('Cargando URL del Renderer...')
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    mainWindow.webContents.openDevTools()
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
@@ -64,9 +70,8 @@ app.whenReady().then(() => {
   })
 })
 
-app.on('window-all-closed', async () => {
+app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    await runAutoBackup()
     app.quit()
   }
 })
